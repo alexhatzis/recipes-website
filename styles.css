@@ -1,0 +1,162 @@
+/* --------------------------------------------------------
+   BASIC PAGE LAYOUT
+-------------------------------------------------------- */
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  line-height: 1.7;
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  color: #222;
+  background: #fafafa;
+}
+
+h1, h2, h3 {
+  font-weight: 600;
+  color: #333;
+  margin-top: 2rem;
+}
+
+h1 {
+  font-size: 2rem;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: .3rem;
+}
+
+h2 {
+  font-size: 1.4rem;
+  border-bottom: 1px solid #e5e5e5;
+  padding-bottom: .2rem;
+}
+
+h3 {
+  font-size: 1.2rem;
+}
+
+/* --------------------------------------------------------
+   LINKS
+-------------------------------------------------------- */
+a {
+  color: #0066cc;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* --------------------------------------------------------
+   LISTS / INGREDIENTS / STEPS
+-------------------------------------------------------- */
+ul, ol {
+  padding-left: 1.4rem;
+  margin-top: .8rem;
+}
+
+li {
+  margin: .3rem 0;
+}
+
+code {
+  background: #eee;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+/* --------------------------------------------------------
+   RECIPE CONTENT BLOCKS
+-------------------------------------------------------- */
+.recipe-metadata {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1.5rem 0;
+}
+
+.recipe-metadata p {
+  margin: .3rem 0;
+}
+
+.ingredients, .instructions {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 1rem 1.2rem;
+  border-radius: 8px;
+  margin: 1.5rem 0;
+}
+
+.ingredients h2,
+.instructions h2 {
+  margin-top: 0;
+}
+
+/* --------------------------------------------------------
+   CODE BLOCKS
+-------------------------------------------------------- */
+pre {
+  background: #f0f0f0;
+  padding: 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  border: 1px solid #ddd;
+}
+
+/* --------------------------------------------------------
+   INDEX PAGE STYLES
+-------------------------------------------------------- */
+.index-container {
+  margin-top: 3rem;
+}
+
+.folder-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-top: 2.5rem;
+  border-left: 4px solid #ccc;
+  padding-left: .6rem;
+}
+
+.index-list {
+  list-style-type: none;
+  padding: 0;
+  margin-top: 0.5rem;
+}
+
+.index-list li {
+  margin: .3rem 0;
+}
+
+.index-list a {
+  font-size: 1rem;
+}
+
+
+/* --------------------------------------------------------
+   TABLES (if used in recipes)
+-------------------------------------------------------- */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: .5rem .7rem;
+}
+
+th {
+  background: #f2f2f2;
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------
+   IMAGES
+-------------------------------------------------------- */
+img {
+  max-width: 100%;
+  display: block;
+  margin: 1.2rem auto;
+  border-radius: 6px;
+}
