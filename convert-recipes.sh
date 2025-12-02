@@ -36,7 +36,7 @@ while IFS= read -r file; do
   fi
 
   # ---- Add entry to the GROUPS map ----
-  GROUPS["$folder"]+=$(printf '    <div class="row"><div class="col-md-6"><img src="../img/aloo-matar.jpg" alt="still testing"></img></div><div class="col-md-6"><a href="%s">%s</a></div></div>\n\n' "$rel_html" "$title")
+  GROUPS["$folder"]+=$(printf '    <div class="row"><div class="col-md-6"><img src="./img/aloo-matar.jpg" alt="still testing"></img></div><div class="col-md-6"><a href="%s">%s</a></div></div>\n\n' "$rel_html" "$title")
 
   echo "Ran script on $file → $out_file"
 

@@ -19,7 +19,7 @@ const html = `<!DOCTYPE html>
 <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
-<img src="img/${getFilenameWithoutPathOrExtension(inputFile)}.jpg" alt="${getFilenameWithoutPathOrExtension(inputFile)}">
+<img src="../img/${getFilenameWithoutPathOrExtension(inputFile)}.jpg" alt="${getFilenameWithoutPathOrExtension(inputFile)}">
 ${htmlContent}
 </body>
 </html>`;
