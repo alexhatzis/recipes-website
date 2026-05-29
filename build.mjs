@@ -68,12 +68,15 @@ for (const file of findMarkdown(INPUT_DIR)) {
 
   // Resolve the image: explicit frontmatter, else <filename>.jpg. Skip if the
   // file doesn't exist (and isn't an external URL) so we never emit a broken img.
+  // Stored relative to the repo root; imgSrc() rebases it per page below.
   const imageName = data.image || `${base}.jpg`;
-  let imageSrc = null;
+  let imageRoot = null; // path from repo root, or an external URL
+  let imageExternal = false;
   if (isExternal(imageName)) {
-    imageSrc = imageName;
+    imageRoot = imageName;
+    imageExternal = true;
   } else if (fs.existsSync(path.join(IMG_DIR, imageName))) {
-    imageSrc = `${prefix}${IMG_DIR}/${imageName}`;
+    imageRoot = `${IMG_DIR}/${imageName}`;
   }
 
   const title = (data.title && String(data.title).trim()) || firstH1(content) || base;
@@ -83,7 +86,8 @@ for (const file of findMarkdown(INPUT_DIR)) {
     category,
     prefix,
     title,
-    imageSrc,
+    imageRoot,
+    imageExternal,
     ingredients: normalizeList(data.ingredients),
     tags: normalizeList(data.tags),
     time: data.time ? String(data.time).trim() : null,
@@ -92,14 +96,22 @@ for (const file of findMarkdown(INPUT_DIR)) {
   });
 }
 
+// Rebase a recipe's image onto a given path prefix ("./" for the root index,
+// "../" etc. for a recipe page). External URLs are returned as-is.
+function imgSrc(r, prefix) {
+  if (!r.imageRoot) return null;
+  return r.imageExternal ? r.imageRoot : `${prefix}${r.imageRoot}`;
+}
+
 // ---- write recipe pages ---------------------------------------------------
 
 for (const r of recipes) {
   const outFile = path.join(OUTPUT_DIR, r.relHtml);
   fs.mkdirSync(path.dirname(outFile), { recursive: true });
 
-  const img = r.imageSrc
-    ? `<img src="${escapeHtml(r.imageSrc)}" alt="${escapeHtml(r.title)}">\n`
+  const src = imgSrc(r, r.prefix);
+  const img = src
+    ? `<img src="${escapeHtml(src)}" alt="${escapeHtml(r.title)}">\n`
     : "";
 
   const page = `<!DOCTYPE html>
@@ -145,8 +157,9 @@ ${items}
 }
 
 function card(r) {
-  const img = r.imageSrc
-    ? `<img src="${escapeHtml(r.imageSrc)}" alt="${escapeHtml(r.title)}">`
+  const src = imgSrc(r, "./"); // index lives at the repo root
+  const img = src
+    ? `<img src="${escapeHtml(src)}" alt="${escapeHtml(r.title)}">`
     : `<div class="card-noimg" aria-hidden="true"></div>`;
   const meta = [r.time, r.servings && `${r.servings} servings`]
     .filter(Boolean)
