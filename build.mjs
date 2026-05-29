@@ -144,16 +144,18 @@ function checkboxes(terms, kind) {
   const items = terms
     .map(
       (t) =>
-        `      <label class="chip"><input type="checkbox" data-kind="${kind}" value="${escapeHtml(
+        `        <label class="chip"><input type="checkbox" data-kind="${kind}" value="${escapeHtml(
           t
         )}"> ${escapeHtml(t)}</label>`
     )
     .join("\n");
-  const legend = kind === "ingredients" ? "Ingredients" : "Tags";
-  return `    <fieldset class="filter-group">
-      <legend>${legend}</legend>
+  const label = kind === "ingredients" ? "Ingredients" : "Tags";
+  return `    <details class="filter-group">
+      <summary>${label} <span class="sel-count" data-kind="${kind}"></span></summary>
+      <div class="chip-list">
 ${items}
-    </fieldset>`;
+      </div>
+    </details>`;
 }
 
 function card(r) {
@@ -239,6 +241,10 @@ const script = `<script>
     }
     document.querySelectorAll(".category").forEach((sec) => {
       sec.hidden = ![...sec.querySelectorAll(".recipe-card")].some((c) => !c.hidden);
+    });
+    document.querySelectorAll(".sel-count").forEach((el) => {
+      const n = selected(el.dataset.kind).length;
+      el.textContent = n ? "(" + n + ")" : "";
     });
     if (count) count.textContent = shown + (shown === 1 ? " recipe" : " recipes");
     if (noMatches) noMatches.hidden = shown !== 0;
