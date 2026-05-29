@@ -1,3 +1,13 @@
+---
+title: Aloo Matar
+image: aloo-matar.jpg
+time: 45 minutes
+servings: 4
+tags: [vegetarian, indian, curry]
+ingredients: [tomato, garlic, ginger, onion, green chili, potato, peas, paneer]
+source: https://www.cookwithmanali.com/instant-pot-aloo-matar
+---
+
 # Aloo Matar  
 
 ## info  
