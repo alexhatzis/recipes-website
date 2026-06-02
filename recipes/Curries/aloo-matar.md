@@ -24,7 +24,7 @@ source: https://www.cookwithmanali.com/instant-pot-aloo-matar
 * 1 tbsp oil  
 * 1 tsp cumin seeds  
 * 1 medium red onion, chopped  
-* 3–4 whole chilies, sliced lenghtwise  
+* 3–4 whole chilies, sliced lengthwise  
 * 1 tsp coriander powder  
 * 1/2 tsp turmeric powder  
 * 1/2 tsp red chili powder  

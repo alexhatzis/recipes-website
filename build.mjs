@@ -49,6 +49,14 @@ function isExternal(src) {
   return /^https?:\/\//.test(src) || src.startsWith("/");
 }
 
+// Folder names are slugs (e.g. "main-dishes"); show them title-cased ("Main Dishes").
+function prettyCategory(folder) {
+  if (folder === "(root)") return folder;
+  return folder
+    .replace(/[-_]+/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 // ---- collect recipes ------------------------------------------------------
 
 const recipes = [];
@@ -188,7 +196,7 @@ const sections = categories
       .map(card)
       .join("\n");
     return `  <section class="category">
-    <h2 class="folder-title">${escapeHtml(cat)}</h2>
+    <h2 class="folder-title">${escapeHtml(prettyCategory(cat))}</h2>
     <div class="card-grid">
 ${cards}
     </div>
