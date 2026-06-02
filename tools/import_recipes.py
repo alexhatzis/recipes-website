@@ -219,8 +219,10 @@ def main():
         print(f"[{idx}/{len(entries)}] {category}/{title}")
         try:
             data = scrape(url)
-            if not data["title"]:
-                data["title"] = title  # fall back to the sheet's recipe name
+            # The sheet's name is canonical — you've curated/adapted these
+            # (e.g. "Chickpea Tikka Masala" from a chicken recipe), so it wins
+            # over the scraped page title.
+            data["title"] = title
             if not data["ingredients"] and not data["instructions"]:
                 raise ValueError("no ingredients or instructions extracted")
 
