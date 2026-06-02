@@ -61,8 +61,19 @@ def unwrap_google_url(href):
     return href
 
 
+def _looks_like_column_letters(texts):
+    """A row that is just spreadsheet column letters (A, B, ... AA) — gridline, not data."""
+    vals = [t for t in texts if t]
+    return bool(vals) and all(re.fullmatch(r"[A-Z]{1,2}", t) for t in vals)
+
+
 def parse_sheet(html_path):
-    """Yield (category, title, url) from the exported sheet HTML."""
+    """Yield (category, title, url) from the exported sheet HTML.
+
+    Google's export includes gridline headers (column letters as <th>, row
+    numbers as <th>); we look only at <td> cells. The category-name row is the
+    first row that has text but no hyperlinks — recipe rows always have links.
+    """
     with open(html_path, encoding="utf-8") as f:
         soup = BeautifulSoup(f.read(), "html.parser")
 
@@ -70,30 +81,32 @@ def parse_sheet(html_path):
     if not table:
         sys.exit("No <table> found in the HTML export.")
 
-    rows = table.find_all("tr")
-    # First row with any text is the header row (category names per column).
+    # Data cells only — drops the column-letter and row-number <th> gridlines.
+    rows = [tr.find_all("td") for tr in table.find_all("tr")]
+    rows = [r for r in rows if r]
+
     header = None
-    body_rows = []
-    for tr in rows:
-        cells = tr.find_all(["td", "th"])
-        if header is None and any(c.get_text(strip=True) for c in cells):
-            header = [c.get_text(strip=True) for c in cells]
-            continue
-        if header is not None:
-            body_rows.append(tr.find_all(["td", "th"]))
+    start = 0
+    for idx, cells in enumerate(rows):
+        texts = [c.get_text(strip=True) for c in cells]
+        has_link = any(c.find("a") for c in cells)
+        if any(texts) and not has_link and not _looks_like_column_letters(texts):
+            header = texts
+            start = idx + 1
+            break
 
-    if not header:
-        sys.exit("Could not find a header row with category names.")
+    if header is None:
+        sys.exit("Could not find a category header row (a row of names with no links).")
 
-    for cells in body_rows:
+    for cells in rows[start:]:
         for i, cell in enumerate(cells):
             link = cell.find("a")
             if not link:
                 continue
             url = unwrap_google_url(link.get("href"))
             title = link.get_text(strip=True)
-            category = header[i] if i < len(header) else "uncategorized"
-            if url and title and category:
+            category = (header[i] if i < len(header) else "") or "uncategorized"
+            if url and title:
                 yield category.strip(), title, url
 
 
