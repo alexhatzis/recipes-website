@@ -54,6 +54,13 @@ standard Anthropic SDK pointed at `https://floodgate.g.apple.com/api/anthropic`)
 By default it mints an auth token via `appleconnect getToken`; set
 `FLOODGATE_TOKEN` to supply your own, or override the command with `--auth-cmd`.
 
+> **TLS note:** On the corporate network, requests go through TLS inspection with
+> an internal Apple root CA. Python doesn't trust that CA out of the box, so the
+> tool uses the `truststore` package to read the macOS keychain (where `curl`
+> finds it). `truststore` is in `requirements.txt` — if you hit
+> `CERTIFICATE_VERIFY_FAILED`, run `pip install truststore`. `--insecure` skips
+> verification as a last resort.
+
 ```bash
 python fill_filter_vocab.py --list-models   # show available model IDs (e.g. anthropic.claude-*)
 python fill_filter_vocab.py --dry-run       # list recipes needing vocab; no API calls

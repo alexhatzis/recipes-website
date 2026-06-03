@@ -34,6 +34,7 @@ import shlex
 import subprocess
 
 import anthropic
+import httpx
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_URL = "https://floodgate.g.apple.com/api/anthropic"
@@ -98,21 +99,59 @@ HAS_REAL_INGREDIENTS = re.compile(r"^ingredients:", re.M)
 
 
 def get_token(auth_cmd):
-    """Floodgate Bearer token: FLOODGATE_TOKEN if set, else mint via appleconnect."""
+    """Floodgate Bearer token: FLOODGATE_TOKEN if set, else mint via appleconnect.
+
+    appleconnect prints several lines; the OAuth token is the field after
+    'oauth-id' (mirrors `... | grep oauth-id | cut -d' ' -f2`).
+    """
     env = os.environ.get("FLOODGATE_TOKEN")
     if env:
         return env.strip()
     res = subprocess.run(shlex.split(auth_cmd), capture_output=True, text=True)
-    if res.returncode != 0 or not res.stdout.strip():
+    if res.returncode != 0:
         raise SystemExit(f"Failed to mint token via:\n  {auth_cmd}\n{res.stderr.strip()}")
-    return res.stdout.split()[-1]
+    for line in res.stdout.splitlines():
+        if "oauth-id" in line:
+            toks = line.split()
+            for i, t in enumerate(toks):
+                if "oauth-id" in t and i + 1 < len(toks):
+                    return toks[i + 1]
+            if len(toks) >= 2:
+                return toks[1]
+    raise SystemExit(f"No 'oauth-id' token found in appleconnect output:\n{res.stdout.strip()}")
 
 
-def make_client(auth_cmd):
+def make_http_client(insecure):
+    """httpx client that trusts the OS keychain (incl. corporate root CAs), like curl.
+
+    The default certifi bundle doesn't include the internal Apple root CA used
+    for TLS inspection, so verification fails without this. --insecure is a last
+    resort that skips verification entirely.
+    """
+    if insecure:
+        return httpx.Client(verify=False)
+    try:
+        import ssl
+        import truststore
+    except ImportError:
+        raise SystemExit(
+            "TLS verification on this network needs the system trust store.\n"
+            "  pip install truststore   (then re-run)\n"
+            "Or pass --insecure to skip verification."
+        )
+    return httpx.Client(verify=truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT))
+
+
+def make_client(auth_cmd, insecure):
     # auth_token sends Authorization: Bearer. Drop any stray ANTHROPIC_API_KEY so
     # the SDK doesn't also send x-api-key (sending both is rejected with a 401).
     os.environ.pop("ANTHROPIC_API_KEY", None)
-    return anthropic.Anthropic(auth_token=get_token(auth_cmd), base_url=BASE_URL)
+    return anthropic.Anthropic(
+        auth_token=get_token(auth_cmd),
+        base_url=BASE_URL,
+        http_client=make_http_client(insecure),
+        default_headers={"User-Agent": "recipes-website/1.0"},
+    )
 
 
 def needs_vocab(text):
@@ -173,10 +212,11 @@ def main():
     ap.add_argument("--list-models", action="store_true", help="List available model IDs and exit")
     ap.add_argument("--model", default=MODEL, help=f"Model ID (default {MODEL})")
     ap.add_argument("--auth-cmd", default=AUTH_CMD, help="Command that prints a Floodgate token")
+    ap.add_argument("--insecure", action="store_true", help="Skip TLS verification (last resort)")
     args = ap.parse_args()
 
     if args.list_models:
-        for m in make_client(args.auth_cmd).models.list():
+        for m in make_client(args.auth_cmd, args.insecure).models.list():
             print(m.id)
         return
 
@@ -196,7 +236,7 @@ def main():
     if not todo:
         return
 
-    client = make_client(args.auth_cmd)
+    client = make_client(args.auth_cmd, args.insecure)
     ok = 0
     for idx, f in enumerate(todo, 1):
         text = open(f, encoding="utf-8").read()

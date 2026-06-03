@@ -2,3 +2,4 @@ recipe-scrapers>=14.56,<16
 requests>=2.31
 beautifulsoup4>=4.12
 anthropic>=0.40
+truststore>=0.9
