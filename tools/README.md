@@ -95,7 +95,8 @@ list you curate (e.g. just produce + proteins):
 python fill_filter_vocab.py --dump-ingredients > my-ingredients.txt
 
 # 2. Edit my-ingredients.txt down to the terms you want to filter on
-#    (one per line; '#' starts a comment; pick ONE spelling per ingredient)
+#    (one per line; '#' starts a comment; pick ONE spelling per ingredient).
+#    You can leave the leading counts in place — they're stripped on load.
 
 # 3. Re-tag every recipe's `ingredients:` with the subset of your list it contains
 python fill_filter_vocab.py --vocab my-ingredients.txt --dry-run   # preview which files

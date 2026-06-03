@@ -240,6 +240,8 @@ def load_vocab(path):
     vocab, seen = [], set()
     for line in open(path, encoding="utf-8"):
         term = line.split("#", 1)[0].strip()
+        # Tolerate a leading count from `--dump-ingredients` output ("8  tomato" -> "tomato").
+        term = re.sub(r"^\d+\s+", "", term)
         if term and term.lower() not in seen:
             seen.add(term.lower())
             vocab.append(term)
