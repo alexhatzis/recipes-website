@@ -55,11 +55,19 @@ By default it mints an auth token via `appleconnect getToken`; set
 `FLOODGATE_TOKEN` to supply your own, or override the command with `--auth-cmd`.
 
 > **TLS note:** On the corporate network, requests go through TLS inspection with
-> an internal Apple root CA. Python doesn't trust that CA out of the box, so the
-> tool uses the `truststore` package to read the macOS keychain (where `curl`
-> finds it). `truststore` is in `requirements.txt` — if you hit
-> `CERTIFICATE_VERIFY_FAILED`, run `pip install truststore`. `--insecure` skips
-> verification as a last resort.
+> an internal Apple root CA that Python doesn't trust out of the box (curl works
+> because it reads the macOS keychain). Pick whichever applies:
+> - **Python 3.10+:** `pip install truststore` (in `requirements.txt`) — reads the
+>   keychain automatically, no flags needed.
+> - **Python 3.9** (truststore unavailable): export the keychain to a PEM and pass
+>   `--ca-bundle`:
+>   ```bash
+>   security find-certificate -a -p /Library/Keychains/System.keychain > /tmp/ca.pem
+>   security find-certificate -a -p /System/Library/Keychains/SystemRootCertificates.keychain >> /tmp/ca.pem
+>   python fill_filter_vocab.py --ca-bundle /tmp/ca.pem --list-models
+>   ```
+>   (`REQUESTS_CA_BUNDLE` / `SSL_CERT_FILE` env vars work too.)
+> - **Last resort:** `--insecure` skips verification entirely.
 
 ```bash
 python fill_filter_vocab.py --list-models   # show available model IDs (e.g. anthropic.claude-*)

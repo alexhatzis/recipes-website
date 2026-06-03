@@ -121,35 +121,45 @@ def get_token(auth_cmd):
     raise SystemExit(f"No 'oauth-id' token found in appleconnect output:\n{res.stdout.strip()}")
 
 
-def make_http_client(insecure):
-    """httpx client that trusts the OS keychain (incl. corporate root CAs), like curl.
+def make_http_client(insecure, ca_bundle):
+    """httpx client that trusts the corporate root CA used for TLS inspection.
 
-    The default certifi bundle doesn't include the internal Apple root CA used
-    for TLS inspection, so verification fails without this. --insecure is a last
-    resort that skips verification entirely.
+    The default certifi bundle doesn't include the internal Apple root, so
+    verification fails without one of these (in order of preference):
+      - an explicit CA bundle (--ca-bundle, or REQUESTS_CA_BUNDLE/SSL_CERT_FILE)
+      - truststore, which reads the OS keychain (Python 3.10+ only)
+      - --insecure, which skips verification entirely (last resort)
     """
     if insecure:
         return httpx.Client(verify=False)
+    bundle = ca_bundle or os.environ.get("REQUESTS_CA_BUNDLE") or os.environ.get("SSL_CERT_FILE")
+    if bundle:
+        return httpx.Client(verify=bundle)
     try:
         import ssl
         import truststore
     except ImportError:
         raise SystemExit(
-            "TLS verification on this network needs the system trust store.\n"
-            "  pip install truststore   (then re-run)\n"
-            "Or pass --insecure to skip verification."
+            "TLS verification needs the corporate root CA, and `truststore` is\n"
+            "unavailable on this Python (it needs 3.10+). Pick one:\n"
+            "  1) Export the keychain to a PEM and point the tool at it:\n"
+            "       security find-certificate -a -p /Library/Keychains/System.keychain > /tmp/ca.pem\n"
+            "       security find-certificate -a -p /System/Library/Keychains/SystemRootCertificates.keychain >> /tmp/ca.pem\n"
+            "       python fill_filter_vocab.py --ca-bundle /tmp/ca.pem ...\n"
+            "  2) Recreate the venv on Python 3.10+, then `pip install truststore`.\n"
+            "  3) Pass --insecure to skip verification (last resort)."
         )
     return httpx.Client(verify=truststore.SSLContext(ssl.PROTOCOL_TLS_CLIENT))
 
 
-def make_client(auth_cmd, insecure):
+def make_client(auth_cmd, insecure, ca_bundle):
     # auth_token sends Authorization: Bearer. Drop any stray ANTHROPIC_API_KEY so
     # the SDK doesn't also send x-api-key (sending both is rejected with a 401).
     os.environ.pop("ANTHROPIC_API_KEY", None)
     return anthropic.Anthropic(
         auth_token=get_token(auth_cmd),
         base_url=BASE_URL,
-        http_client=make_http_client(insecure),
+        http_client=make_http_client(insecure, ca_bundle),
         default_headers={"User-Agent": "recipes-website/1.0"},
     )
 
@@ -212,11 +222,12 @@ def main():
     ap.add_argument("--list-models", action="store_true", help="List available model IDs and exit")
     ap.add_argument("--model", default=MODEL, help=f"Model ID (default {MODEL})")
     ap.add_argument("--auth-cmd", default=AUTH_CMD, help="Command that prints a Floodgate token")
+    ap.add_argument("--ca-bundle", help="Path to a CA bundle PEM that includes the corporate root")
     ap.add_argument("--insecure", action="store_true", help="Skip TLS verification (last resort)")
     args = ap.parse_args()
 
     if args.list_models:
-        for m in make_client(args.auth_cmd, args.insecure).models.list():
+        for m in make_client(args.auth_cmd, args.insecure, args.ca_bundle).models.list():
             print(m.id)
         return
 
@@ -236,7 +247,7 @@ def main():
     if not todo:
         return
 
-    client = make_client(args.auth_cmd, args.insecure)
+    client = make_client(args.auth_cmd, args.insecure, args.ca_bundle)
     ok = 0
     for idx, f in enumerate(todo, 1):
         text = open(f, encoding="utf-8").read()
