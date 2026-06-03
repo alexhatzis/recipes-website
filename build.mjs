@@ -49,12 +49,29 @@ function isExternal(src) {
   return /^https?:\/\//.test(src) || src.startsWith("/");
 }
 
-// Folder names are slugs (e.g. "main-dishes"); show them title-cased ("Main Dishes").
+// Explicit display names for category folders whose slug can't capture the
+// intended punctuation (commas, ampersands). Anything not listed is derived
+// from the slug by prettyCategory(). Keyed by folder name.
+const CATEGORY_LABELS = {
+  "sandwiches-wraps-breads": "Sandwiches, Wraps & Breads",
+};
+
+// Words kept lowercase mid-phrase when title-casing a category slug.
+const MINOR_WORDS = new Set(["and", "or", "the", "of", "with", "a", "an", "in", "on", "to", "for"]);
+
+// Folder names are slugs (e.g. "main-dishes"); show them title-cased
+// ("Main Dishes"), with minor words lowercased ("pasta-and-noodles" ->
+// "Pasta and Noodles"). CATEGORY_LABELS overrides take precedence.
 function prettyCategory(folder) {
   if (folder === "(root)") return folder;
+  if (CATEGORY_LABELS[folder]) return CATEGORY_LABELS[folder];
   return folder
     .replace(/[-_]+/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+    .split(" ")
+    .map((w, i) =>
+      i > 0 && MINOR_WORDS.has(w) ? w : w.charAt(0).toUpperCase() + w.slice(1)
+    )
+    .join(" ");
 }
 
 // ---- collect recipes ------------------------------------------------------
