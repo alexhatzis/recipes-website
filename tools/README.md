@@ -45,21 +45,28 @@ Other flags: `--skip-images` (text only), `--delay 2` (seconds between requests)
 ## Filling the filter vocabulary
 
 `fill_filter_vocab.py` reads each recipe whose `ingredients:`/`tags:` are still
-TODO comments, asks Claude (`claude-opus-4-8`) to derive a normalized,
-filter-ready ingredient list + tags from the title and ingredient section, and
-rewrites those two frontmatter lines. Files with a real `ingredients:` key are
-skipped, so it's safe to re-run.
+TODO comments, asks Claude to derive a normalized, filter-ready ingredient list +
+tags from the title and ingredient section, and rewrites those two frontmatter
+lines. Files with a real `ingredients:` key are skipped, so it's safe to re-run.
 
-Requires an API key:
+It calls Claude through Apple's internal **Floodgate** interactive API (the
+standard Anthropic SDK pointed at `https://floodgate.g.apple.com/api/anthropic`).
+By default it mints an auth token via `appleconnect getToken`; set
+`FLOODGATE_TOKEN` to supply your own, or override the command with `--auth-cmd`.
 
 ```bash
-export ANTHROPIC_API_KEY=sk-ant-...
-python fill_filter_vocab.py --dry-run     # list recipes needing vocab; no API calls
-python fill_filter_vocab.py --limit 3     # process 3, then review `git diff`
-python fill_filter_vocab.py               # process all
+python fill_filter_vocab.py --list-models   # show available model IDs (e.g. anthropic.claude-*)
+python fill_filter_vocab.py --dry-run       # list recipes needing vocab; no API calls
+python fill_filter_vocab.py --limit 3       # process 3, then review `git diff`
+python fill_filter_vocab.py                 # process all
+python fill_filter_vocab.py --model anthropic.claude-opus-4-8   # if an Opus ID is available
 ```
+
+Default model is `anthropic.claude-sonnet-4-6` (plenty for this normalization).
+Run `--list-models` to see what else Floodgate offers.
 
 It is **faithful to the recipe text**: an un-edited adapted recipe that still
 lists "chicken" will get `chicken` in its ingredients. Edit the adapted recipes
 listed in `needs-review.txt` first, then re-run this to refresh them.
+
 

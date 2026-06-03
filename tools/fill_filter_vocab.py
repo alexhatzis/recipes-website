@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-Fill the `ingredients:` / `tags:` filter vocabulary on imported recipes.
+Fill the `ingredients:` / `tags:` filter vocabulary on imported recipes, using
+Claude via Apple's internal Floodgate interactive API (Anthropic-compatible).
 
 The importer leaves these as TODO comments:
 
@@ -8,31 +9,40 @@ The importer leaves these as TODO comments:
     # tags: []          # TODO: filter tags (e.g. vegetarian, quick)
 
 This tool reads each such recipe, asks Claude to derive a normalized,
-filter-ready ingredient list and tags from the recipe's title + ingredient
-section, and rewrites those two lines with real YAML arrays. Files that already
-have a real `ingredients:` key are skipped, so it's safe to re-run.
+filter-ready ingredient list + tags from the title and ingredient section, and
+rewrites those two lines with real YAML arrays. Files that already have a real
+`ingredients:` key are skipped, so it's safe to re-run.
 
 It is faithful to the recipe text as written: if an un-edited adapted recipe
 still lists "chicken", the ingredients will include "chicken". Edit the adapted
 recipes (see tools/needs-review.txt) first, then re-run this to refresh them.
 
-Requires ANTHROPIC_API_KEY in the environment.
+Auth: by default it mints a Floodgate token via `appleconnect getToken`. Set
+FLOODGATE_TOKEN to supply one yourself, or override the command with --auth-cmd.
 
 Usage:
-  python tools/fill_filter_vocab.py --dry-run        # list recipes needing vocab; no API calls
-  python tools/fill_filter_vocab.py --limit 3        # process the first 3 (review the diff)
-  python tools/fill_filter_vocab.py                  # process all
+  python tools/fill_filter_vocab.py --list-models     # show available model IDs
+  python tools/fill_filter_vocab.py --dry-run         # list recipes needing vocab; no API calls
+  python tools/fill_filter_vocab.py --limit 3         # process the first 3 (review the diff)
+  python tools/fill_filter_vocab.py                   # process all
 """
 import argparse
 import glob
 import os
 import re
-import sys
+import shlex
+import subprocess
 
 import anthropic
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MODEL = "claude-opus-4-8"
+BASE_URL = "https://floodgate.g.apple.com/api/anthropic"
+MODEL = "anthropic.claude-sonnet-4-6"
+AUTH_CMD = (
+    "/usr/local/bin/appleconnect getToken -C hvys3fcwcteqrvw3qzkvtk86viuoqv "
+    "--token-type=oauth --interactivity-type=none -E prod -G pkce "
+    "-o openid,dsid,accountname,profile,groups"
+)
 
 SYSTEM = """You normalize recipe data into a controlled vocabulary used to power \
 ingredient/tag filtering on a personal (vegetarian-leaning) recipe website.
@@ -87,6 +97,24 @@ TODO_TAGS = re.compile(r"^# tags:.*$", re.M)
 HAS_REAL_INGREDIENTS = re.compile(r"^ingredients:", re.M)
 
 
+def get_token(auth_cmd):
+    """Floodgate Bearer token: FLOODGATE_TOKEN if set, else mint via appleconnect."""
+    env = os.environ.get("FLOODGATE_TOKEN")
+    if env:
+        return env.strip()
+    res = subprocess.run(shlex.split(auth_cmd), capture_output=True, text=True)
+    if res.returncode != 0 or not res.stdout.strip():
+        raise SystemExit(f"Failed to mint token via:\n  {auth_cmd}\n{res.stderr.strip()}")
+    return res.stdout.split()[-1]
+
+
+def make_client(auth_cmd):
+    # auth_token sends Authorization: Bearer. Drop any stray ANTHROPIC_API_KEY so
+    # the SDK doesn't also send x-api-key (sending both is rejected with a 401).
+    os.environ.pop("ANTHROPIC_API_KEY", None)
+    return anthropic.Anthropic(auth_token=get_token(auth_cmd), base_url=BASE_URL)
+
+
 def needs_vocab(text):
     return bool(TODO_INGREDIENTS.search(text)) and not HAS_REAL_INGREDIENTS.search(text)
 
@@ -108,8 +136,7 @@ def get_ingredients_section(body):
 
 
 def yaml_flow_list(items):
-    out = []
-    seen = set()
+    out, seen = [], set()
     for raw in items:
         item = str(raw).strip().lower()
         if not item or item in seen:
@@ -122,17 +149,14 @@ def yaml_flow_list(items):
     return "[" + ", ".join(out) + "]"
 
 
-def derive(client, title, ingredients_text):
+def derive(client, model, title, ingredients_text):
+    # Forcing the tool guarantees a structured result. Incompatible with extended
+    # thinking, which is fine here — normalization is a light task.
     resp = client.messages.create(
-        model=MODEL,
+        model=model,
         max_tokens=1024,
-        # Stable prefix (tools + system) gets a cache breakpoint. Note: Opus only
-        # caches prefixes >= 4096 tokens, so this may not engage at this size —
-        # it's correct practice and harmless if it doesn't.
-        system=[{"type": "text", "text": SYSTEM, "cache_control": {"type": "ephemeral"}}],
+        system=SYSTEM,
         tools=[TOOL],
-        # Forcing the tool guarantees a structured result. This is incompatible
-        # with extended/adaptive thinking, which is fine — normalization is light.
         tool_choice={"type": "tool", "name": "record_filters"},
         messages=[{"role": "user", "content": f"Title: {title}\n\nIngredients:\n{ingredients_text}"}],
     )
@@ -146,12 +170,21 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--limit", type=int, help="Only process the first N recipes")
     ap.add_argument("--dry-run", action="store_true", help="List recipes needing vocab; no API calls")
+    ap.add_argument("--list-models", action="store_true", help="List available model IDs and exit")
+    ap.add_argument("--model", default=MODEL, help=f"Model ID (default {MODEL})")
+    ap.add_argument("--auth-cmd", default=AUTH_CMD, help="Command that prints a Floodgate token")
     args = ap.parse_args()
 
-    todo = []
-    for f in sorted(glob.glob(os.path.join(REPO, "recipes", "**", "*.md"), recursive=True)):
-        if needs_vocab(open(f, encoding="utf-8").read()):
-            todo.append(f)
+    if args.list_models:
+        for m in make_client(args.auth_cmd).models.list():
+            print(m.id)
+        return
+
+    todo = [
+        f
+        for f in sorted(glob.glob(os.path.join(REPO, "recipes", "**", "*.md"), recursive=True))
+        if needs_vocab(open(f, encoding="utf-8").read())
+    ]
     if args.limit:
         todo = todo[: args.limit]
 
@@ -163,7 +196,7 @@ def main():
     if not todo:
         return
 
-    client = anthropic.Anthropic()  # reads ANTHROPIC_API_KEY
+    client = make_client(args.auth_cmd)
     ok = 0
     for idx, f in enumerate(todo, 1):
         text = open(f, encoding="utf-8").read()
@@ -171,7 +204,7 @@ def main():
         title = get_title(fm, os.path.basename(f))
         print(f"[{idx}/{len(todo)}] {title}")
         try:
-            ingredients, tags = derive(client, title, get_ingredients_section(body))
+            ingredients, tags = derive(client, args.model, title, get_ingredients_section(body))
             text = TODO_INGREDIENTS.sub("ingredients: " + yaml_flow_list(ingredients), text, count=1)
             text = TODO_TAGS.sub("tags: " + yaml_flow_list(tags), text, count=1)
             with open(f, "w", encoding="utf-8") as out:
