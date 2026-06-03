@@ -84,4 +84,28 @@ It is **faithful to the recipe text**: an un-edited adapted recipe that still
 lists "chicken" will get `chicken` in its ingredients. Edit the adapted recipes
 listed in `needs-review.txt` first, then re-run this to refresh them.
 
+### Controlled-vocabulary mode (recommended for consistency)
+
+Open extraction tends to drift ("vegetable broth" vs "veggie broth" vs "vegetable
+stock") and includes more than you'd filter on. To instead tag against a fixed
+list you curate (e.g. just produce + proteins):
+
+```bash
+# 1. Bootstrap: dump the ingredients currently tagged, with counts (no API call)
+python fill_filter_vocab.py --dump-ingredients > my-ingredients.txt
+
+# 2. Edit my-ingredients.txt down to the terms you want to filter on
+#    (one per line; '#' starts a comment; pick ONE spelling per ingredient)
+
+# 3. Re-tag every recipe's `ingredients:` with the subset of your list it contains
+python fill_filter_vocab.py --vocab my-ingredients.txt --dry-run   # preview which files
+python fill_filter_vocab.py --vocab my-ingredients.txt --limit 3   # spot-check
+python fill_filter_vocab.py --vocab my-ingredients.txt             # all
+```
+
+In `--vocab` mode the model maps recipe wording onto your list ("garbanzo beans"
+→ `chickpea`), and a hard post-filter drops anything not in the list — so the
+output is always a subset of what you curated. It rewrites only `ingredients:`
+and leaves `tags:` untouched. Re-run it whenever you add recipes or edit the list.
+
 

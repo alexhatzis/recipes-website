@@ -96,6 +96,7 @@ TOOL = {
 TODO_INGREDIENTS = re.compile(r"^# ingredients:.*$", re.M)
 TODO_TAGS = re.compile(r"^# tags:.*$", re.M)
 HAS_REAL_INGREDIENTS = re.compile(r"^ingredients:", re.M)
+ANY_INGREDIENTS = re.compile(r"^(?:#\s*)?ingredients:.*$", re.M)  # real or TODO line
 
 
 def get_token(auth_cmd):
@@ -215,20 +216,158 @@ def derive(client, model, title, ingredients_text):
     raise ValueError(f"no tool_use in response (stop_reason={resp.stop_reason})")
 
 
+# ---- controlled-vocabulary mode (--vocab) ---------------------------------
+
+VOCAB_TOOL = {
+    "name": "record_ingredients",
+    "description": "Record which controlled-vocabulary ingredients the recipe contains.",
+    "input_schema": {
+        "type": "object",
+        "properties": {
+            "ingredients": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "Subset of the controlled vocabulary present in the recipe.",
+            },
+        },
+        "required": ["ingredients"],
+        "additionalProperties": False,
+    },
+}
+
+
+def load_vocab(path):
+    vocab, seen = [], set()
+    for line in open(path, encoding="utf-8"):
+        term = line.split("#", 1)[0].strip()
+        if term and term.lower() not in seen:
+            seen.add(term.lower())
+            vocab.append(term)
+    if not vocab:
+        raise SystemExit(f"No ingredients found in vocab file: {path}")
+    return vocab
+
+
+def vocab_system(vocab):
+    return (
+        "You tag recipes against a FIXED, controlled ingredient vocabulary used by a "
+        "recipe website's filter.\n\nControlled vocabulary (return ONLY these exact terms):\n"
+        + "\n".join(f"- {v}" for v in vocab)
+        + "\n\nGiven a recipe title and its raw ingredient list, call record_ingredients with "
+        "the subset of the controlled vocabulary that the recipe actually contains. Map "
+        'variants/synonyms onto the closest vocabulary term (e.g. "garbanzo beans" -> '
+        '"chickpea", "scallions" -> "green onion", "coriander" -> "cilantro") only when the '
+        "recipe truly contains it. Never output a term that is not in the vocabulary, and "
+        "never guess ingredients that are not present."
+    )
+
+
+def derive_from_vocab(client, model, system, vocab, title, ingredients_text):
+    resp = client.messages.create(
+        model=model,
+        max_tokens=1024,
+        system=system,
+        tools=[VOCAB_TOOL],
+        tool_choice={"type": "tool", "name": "record_ingredients"},
+        messages=[{"role": "user", "content": f"Title: {title}\n\nIngredients:\n{ingredients_text}"}],
+    )
+    canon = {v.lower(): v for v in vocab}  # hard post-filter: nothing outside the vocab
+    for block in resp.content:
+        if block.type == "tool_use" and block.name == "record_ingredients":
+            out, seen = [], set()
+            for it in block.input.get("ingredients", []):
+                key = str(it).strip().lower()
+                if key in canon and key not in seen:
+                    seen.add(key)
+                    out.append(canon[key])
+            return out
+    raise ValueError(f"no tool_use in response (stop_reason={resp.stop_reason})")
+
+
+def parse_ingredients_line(frontmatter):
+    m = re.search(r"^ingredients:\s*\[(.*)\]\s*$", frontmatter, re.M)
+    if not m:
+        return []
+    items = []
+    for part in m.group(1).split(","):
+        p = part.strip().strip('"').strip("'").strip()
+        if p:
+            items.append(p)
+    return items
+
+
+def collect_ingredient_counts():
+    from collections import Counter
+
+    counts = Counter()
+    for f in sorted(glob.glob(os.path.join(REPO, "recipes", "**", "*.md"), recursive=True)):
+        fm, _ = split_frontmatter(open(f, encoding="utf-8").read())
+        for ing in parse_ingredients_line(fm):
+            counts[ing.lower()] += 1
+    return counts
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--limit", type=int, help="Only process the first N recipes")
     ap.add_argument("--dry-run", action="store_true", help="List recipes needing vocab; no API calls")
     ap.add_argument("--list-models", action="store_true", help="List available model IDs and exit")
     ap.add_argument("--model", default=MODEL, help=f"Model ID (default {MODEL})")
+    ap.add_argument("--dump-ingredients", action="store_true",
+                    help="Print every distinct tagged ingredient with counts, then exit (no API)")
+    ap.add_argument("--vocab", metavar="FILE",
+                    help="Controlled-vocabulary mode: re-tag each recipe's ingredients: with the "
+                         "subset of this list it contains (one term per line, # comments allowed)")
     ap.add_argument("--auth-cmd", default=AUTH_CMD, help="Command that prints a Floodgate token")
     ap.add_argument("--ca-bundle", help="Path to a CA bundle PEM that includes the corporate root")
     ap.add_argument("--insecure", action="store_true", help="Skip TLS verification (last resort)")
     args = ap.parse_args()
 
+    if args.dump_ingredients:
+        counts = collect_ingredient_counts()
+        for term, n in sorted(counts.items(), key=lambda kv: (-kv[1], kv[0])):
+            print(f"{n:4d}  {term}")
+        print(f"\n{len(counts)} distinct ingredients across {sum(counts.values())} tags.")
+        return
+
     if args.list_models:
         for m in make_client(args.auth_cmd, args.insecure, args.ca_bundle).models.list():
             print(m.id)
+        return
+
+    if args.vocab:
+        vocab = load_vocab(args.vocab)
+        recipes = [
+            f
+            for f in sorted(glob.glob(os.path.join(REPO, "recipes", "**", "*.md"), recursive=True))
+            if ANY_INGREDIENTS.search(open(f, encoding="utf-8").read())
+        ]
+        if args.limit:
+            recipes = recipes[: args.limit]
+        print(f"Re-tagging {len(recipes)} recipe(s) against {len(vocab)} controlled ingredients.\n")
+        if args.dry_run:
+            for f in recipes:
+                print(f"  {os.path.relpath(f, REPO)}")
+            return
+
+        client = make_client(args.auth_cmd, args.insecure, args.ca_bundle)
+        system = vocab_system(vocab)
+        ok = 0
+        for idx, f in enumerate(recipes, 1):
+            text = open(f, encoding="utf-8").read()
+            fm, body = split_frontmatter(text)
+            title = get_title(fm, os.path.basename(f))
+            print(f"[{idx}/{len(recipes)}] {title}")
+            try:
+                found = derive_from_vocab(client, args.model, system, vocab, title, get_ingredients_section(body))
+                text = ANY_INGREDIENTS.sub("ingredients: " + yaml_flow_list(found), text, count=1)
+                with open(f, "w", encoding="utf-8") as out:
+                    out.write(text)
+                print(f"    ingredients: {yaml_flow_list(found)}")
+                ok += 1
+            except Exception as e:
+                print(f"    FAILED: {e}")
+        print(f"\nDone. {ok}/{len(recipes)} re-tagged. Review with `git diff`, then `npm run build`.")
         return
 
     todo = [
