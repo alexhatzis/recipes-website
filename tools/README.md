@@ -39,5 +39,27 @@ Other flags: `--skip-images` (text only), `--delay 2` (seconds between requests)
   copy/paste manually into a `.md`).
 - The importer fills `title`, `image`, `time`, `servings`, and `source`. It
   leaves `ingredients:` / `tags:` (the normalized **filter** vocabulary) as
-  TODO comments — fill those in a later pass.
+  TODO comments — fill those with `fill_filter_vocab.py` (below).
 - Run `npm run build` from the repo root and review `index.html`.
+
+## Filling the filter vocabulary
+
+`fill_filter_vocab.py` reads each recipe whose `ingredients:`/`tags:` are still
+TODO comments, asks Claude (`claude-opus-4-8`) to derive a normalized,
+filter-ready ingredient list + tags from the title and ingredient section, and
+rewrites those two frontmatter lines. Files with a real `ingredients:` key are
+skipped, so it's safe to re-run.
+
+Requires an API key:
+
+```bash
+export ANTHROPIC_API_KEY=sk-ant-...
+python fill_filter_vocab.py --dry-run     # list recipes needing vocab; no API calls
+python fill_filter_vocab.py --limit 3     # process 3, then review `git diff`
+python fill_filter_vocab.py               # process all
+```
+
+It is **faithful to the recipe text**: an un-edited adapted recipe that still
+lists "chicken" will get `chicken` in its ingredients. Edit the adapted recipes
+listed in `needs-review.txt` first, then re-run this to refresh them.
+

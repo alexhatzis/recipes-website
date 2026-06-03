@@ -4,9 +4,10 @@ node_modules/
 # Build output (generated from recipes/ by build.mjs; CI rebuilds on deploy)
 *.html
 
-# Importer (tools/) — venv, sheet exports, failure logs
+# Importer (tools/) — venv, sheet exports, generated reports
 tools/.venv/
 tools/import-failures.txt
+tools/needs-review.txt
 
 # macOS / Python cruft
 .DS_Store
