@@ -136,7 +136,7 @@ for (const r of recipes) {
 
   const src = imgSrc(r, r.prefix);
   const img = src
-    ? `<img src="${escapeHtml(src)}" alt="${escapeHtml(r.title)}">\n`
+    ? `<img class="recipe-image" src="${escapeHtml(src)}" alt="${escapeHtml(r.title)}">\n`
     : "";
 
   const page = `<!DOCTYPE html>

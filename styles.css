@@ -260,3 +260,11 @@ img {
   margin: 1.2rem auto;
   border-radius: 6px;
 }
+
+/* Hero image on an individual recipe page — capped so tall photos
+   don't dominate the page. Adjust max-height to taste. */
+.recipe-image {
+  max-height: 400px;
+  width: auto;
+}
+
