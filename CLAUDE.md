@@ -27,7 +27,7 @@ locally on macOS, unlike the previous bash-based build.
    with `gray-matter`, render the body with `marked`, and resolve per-recipe metadata
    (with fallbacks, below).
 2. **Write recipe pages** — one `.html` per recipe, output at the repo root mirroring the
-   recipe's subfolder (`recipes/Curries/aloo-matar.md` → `Curries/aloo-matar.html`). The
+   recipe's subfolder (`recipes/curries/dal.md` → `curries/dal.html`). The
    path back to the root (for `styles.css` and `img/`) is computed from folder depth, so
    nesting deeper than one level works.
 3. **Write `index.html`** — recipe cards grouped by category, plus a client-side filter bar.
@@ -66,10 +66,22 @@ static — no fetch, no backend, works as-is on GitHub Pages.
 
 ## Conventions
 
-- **Category** = the recipe's containing folder (`recipes/Curries/` → "Curries");
-  files directly in `recipes/` map to "(root)".
+- **Category** = the recipe's containing folder, named as a lowercase slug
+  (`recipes/curries/`, `recipes/main-dishes/`). The index heading is derived from the
+  slug by `prettyCategory()` (title-cased, minor words like "and"/"of" kept lowercase);
+  add a `CATEGORY_LABELS` entry in `build.mjs` for names the slug can't express (commas,
+  `&`). Files directly in `recipes/` map to "(root)". **Keep folder names lowercase** —
+  the Linux CI build is case-sensitive even though macOS isn't, so a stray `Curries/`
+  becomes a second category there.
 - Add a recipe by dropping a `.md` in a category folder (and optionally a matching image
   in `img/`). No code changes needed.
+- **Removing or renaming a recipe leaves a stale generated `.html`** — the build only
+  writes, it never deletes. This is harmless on the live site (CI builds from a clean
+  checkout) and the files are gitignored, but to clear leftovers from your working copy,
+  delete and rebuild:
+  ```bash
+  find . -name '*.html' -not -path './node_modules/*' -delete && npm run build
+  ```
 - All user-supplied strings are HTML-escaped in `build.mjs`; `data-*` filter values are
   pipe-delimited so multi-word terms (e.g. `green chili`) survive.
 
