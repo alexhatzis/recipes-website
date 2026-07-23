@@ -103,6 +103,10 @@ python fill_filter_vocab.py --vocab my-ingredients.txt --dry-run   # preview whi
 python fill_filter_vocab.py --vocab my-ingredients.txt --limit 3   # spot-check
 python fill_filter_vocab.py --vocab my-ingredients.txt             # all
 ```
+I also had to do this:
+security find-certificate -a -p /Library/Keychains/System.keychain > /tmp/ca.pem
+security find-certificate -a -p /System/Library/Keychains/SystemRootCertificates.keychain >> /tmp/ca.pem
+python fill_filter_vocab.py --ca-bundle /tmp/ca.pem --list-models
 
 In `--vocab` mode the model maps recipe wording onto your list ("garbanzo beans"
 → `chickpea`), and a hard post-filter drops anything not in the list — so the

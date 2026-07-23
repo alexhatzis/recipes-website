@@ -1,0 +1,321 @@
+  60  garlic
+  40  onion
+  26  cilantro
+  21  ginger
+  19  carrot
+  18  cashew
+  17  tomato
+  15  soy sauce
+  15  vegetable broth
+  13  coconut milk
+  12  basil
+  12  butter
+  12  red onion
+  11  lemon juice
+  11  spinach
+  10  avocado
+  10  celery
+  10  lemon
+  10  tofu
+   9  flour
+   9  nutritional yeast
+   9  parsley
+   9  sweet potato
+   9  tomato paste
+   8  cauliflower
+   8  chickpea
+   8  green chili
+   7  bell pepper
+   7  green onion
+   7  jalapeño
+   7  kale
+   7  lentil
+   7  lime
+   7  potato
+   7  red bell pepper
+   7  shallot
+   6  cherry tomato
+   6  corn
+   6  green pea
+   6  heavy cream
+   6  maple syrup
+   6  mushroom
+   6  parmesan cheese
+   6  scallion
+   5  apple cider vinegar
+   5  balsamic vinegar
+   5  broccoli
+   5  dijon mustard
+   5  egg
+   5  fenugreek leaf
+   5  paneer
+   5  quinoa
+   5  red wine vinegar
+   5  sesame oil
+   5  vegetable stock
+   5  white wine
+   4  black bean
+   4  cucumber
+   4  jackfruit
+   4  peanut butter
+   4  sesame seed
+   4  walnut
+   4  worcestershire sauce
+   4  zucchini
+   3  almond
+   3  arugula
+   3  asparagus
+   3  beet
+   3  brown rice
+   3  cabbage
+   3  eggplant
+   3  feta cheese
+   3  ghee
+   3  gnocchi
+   3  green bell pepper
+   3  ground beef
+   3  lime juice
+   3  marinara sauce
+   3  mint
+   3  mozzarella
+   3  sage
+   3  soy curl
+   3  tahini
+   3  tamari
+   3  tempeh
+   3  thyme
+   3  vegan butter
+   3  white bean
+   3  yogurt
+   2  almond milk
+   2  arborio rice
+   2  artichoke heart
+   2  bread crumb
+   2  butternut squash
+   2  cheddar cheese
+   2  chicken broth
+   2  cornstarch
+   2  cream cheese
+   2  dill
+   2  fenugreek
+   2  flour tortilla
+   2  gruyere cheese
+   2  honey
+   2  hot sauce
+   2  kalamata olive
+   2  kelp
+   2  lasagna noodle
+   2  leafy green
+   2  leek
+   2  milk
+   2  miso paste
+   2  molasses
+   2  mozzarella cheese
+   2  non-dairy milk
+   2  panko
+   2  pasta
+   2  pea
+   2  peanut
+   2  pecan
+   2  pecorino
+   2  pickled onion
+   2  pie crust
+   2  pistachio
+   2  poblano chili
+   2  poppy seed
+   2  portobello mushroom
+   2  red cabbage
+   2  red curry paste
+   2  red wine
+   2  rice
+   2  rice noodle
+   2  rice vinegar
+   2  salsa
+   2  seitan
+   2  sour cream
+   2  spaghetti squash
+   2  sriracha
+   2  tapioca starch
+   2  tomato puree
+   2  tomato sauce
+   2  vegan mayo
+   1  adobo sauce
+   1  all-purpose flour
+   1  anchovy paste
+   1  annatto
+   1  arrowroot
+   1  baby spinach
+   1  baguette
+   1  bao bun
+   1  basil pesto
+   1  bbq sauce
+   1  beef broth
+   1  beer
+   1  black rice
+   1  black vinegar
+   1  blue cheese
+   1  bok choy
+   1  bread
+   1  bread flour
+   1  breadcrumb
+   1  broth
+   1  brussels sprout
+   1  burrata cheese
+   1  cannellini bean
+   1  caper
+   1  carrot top
+   1  cauliflower rice
+   1  chana dal
+   1  cheddar
+   1  chia seed
+   1  chicken
+   1  chicken thigh
+   1  chickpea flour
+   1  chili sauce
+   1  chive
+   1  chopped tomato
+   1  ciabatta
+   1  coconut sugar
+   1  collard green
+   1  coriander
+   1  corn starch
+   1  cotija cheese
+   1  cottage cheese
+   1  courgette
+   1  craisin
+   1  cream
+   1  creme fraiche
+   1  cremini mushroom
+   1  dairy-free milk
+   1  dark soy sauce
+   1  diced tomato
+   1  dried cherry
+   1  dried cranberry
+   1  enchilada sauce
+   1  falafel
+   1  fennel
+   1  fish sauce
+   1  flatbread
+   1  fresno chile
+   1  garam masala
+   1  ginger garlic paste
+   1  goat cheese
+   1  gochugaru
+   1  grape tomato
+   1  green cabbage
+   1  green olive
+   1  half and half
+   1  hamburger bun
+   1  harissa
+   1  hearts of palm
+   1  hemp heart
+   1  hoisin sauce
+   1  hummus
+   1  kaffir lime leaf
+   1  kasoori methi
+   1  kasuri methi
+   1  ketchup
+   1  kidney bean
+   1  lemongrass
+   1  lettuce
+   1  liquid smoke
+   1  long bean
+   1  mango salsa
+   1  mascarpone
+   1  mashed potato
+   1  mirin
+   1  mixed greens
+   1  multigrain bread
+   1  mung bean sprout
+   1  mustard
+   1  mustard seed
+   1  naan
+   1  non-dairy yogurt
+   1  nori
+   1  olive
+   1  orange
+   1  orange juice
+   1  orecchiette
+   1  oyster sauce
+   1  panko breadcrumb
+   1  pasta sauce
+   1  pasta shell
+   1  pear
+   1  pearl onion
+   1  peas
+   1  pecorino cheese
+   1  penne pasta
+   1  pesto
+   1  pickle relish
+   1  pine nut
+   1  pineapple
+   1  pineapple juice
+   1  pinto bean
+   1  plantain
+   1  poblano pepper
+   1  pomegranate
+   1  pomegranate molasses
+   1  pumpkin purée
+   1  pumpkin seed
+   1  purple cabbage
+   1  queso fresco
+   1  radish
+   1  raisin
+   1  red chili
+   1  red kidney bean
+   1  red lentil
+   1  red pepper flake
+   1  red potato
+   1  refried bean
+   1  refried black bean
+   1  rice flour
+   1  ricotta
+   1  ricotta cheese
+   1  romaine lettuce
+   1  rye bread
+   1  rye flour
+   1  sambal oelek
+   1  sauerkraut
+   1  sherry
+   1  sherry vinegar
+   1  shiitake mushroom
+   1  shredded cheese
+   1  snap pea
+   1  soy milk
+   1  spicy tomato sauce
+   1  sprout
+   1  sriracha mayo
+   1  strawberry
+   1  sun dried tomato
+   1  sun-dried tomato
+   1  sunflower seed
+   1  sunflower sprout
+   1  taco shell
+   1  thousand island dressing
+   1  tinned tomato
+   1  tomato passata
+   1  tomato soup
+   1  tortilla
+   1  turmeric
+   1  tzatziki sauce
+   1  udon noodle
+   1  vegan cheese
+   1  vegan mayonnaise
+   1  vegan parmesan cheese
+   1  vegan sausage
+   1  vegan yogurt
+   1  veggie broth
+   1  vodka
+   1  watercress
+   1  white mushroom
+   1  white rice
+   1  whole grain bread
+   1  whole grain mustard
+   1  whole wheat pasta
+   1  whole-wheat bun
+   1  yakisoba noodle
+   1  yeast
+   1  yellow onion
+   1  ziti
+
+319 distinct ingredients across 971 tags.
