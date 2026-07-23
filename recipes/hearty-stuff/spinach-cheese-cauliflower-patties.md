@@ -8,7 +8,7 @@ ingredients: [cauliflower, mozzarella, parmesan cheese, parsley, spinach]
 tags: []
 ---
 
-# Vegan Blueberry Grilled Cheese with Mint Pesto
+# Spinach and Cheese Stuffed Cauliflower Patties
 
 ## ingredients
 * 1 medium cauliflower head

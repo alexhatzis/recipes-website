@@ -8,7 +8,7 @@ ingredients: [chickpea, peanut, avocado, carrot, onion, scallion, rice, coconut 
 tags: []
 ---
 
-# Buffalo Soy Curl Salad
+# Thai Lettuce Wraps with Chickpeas
 
 ## ingredients
 * 1 head iceberg lettuce
