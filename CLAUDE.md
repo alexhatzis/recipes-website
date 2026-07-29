@@ -7,7 +7,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 A static recipe website. Recipes are authored as Markdown (with YAML frontmatter)
 under `recipes/`, compiled to standalone HTML pages plus a filterable `index.html`,
 and deployed to GitHub Pages. There is no framework, server, or test suite — the build
-is a single Node script (`build.mjs`).
+is a single Node script (`build.mjs`) driven by `site.config.json` (site title + category
+labels).
 
 ## Commands
 
@@ -69,8 +70,8 @@ static — no fetch, no backend, works as-is on GitHub Pages.
 - **Category** = the recipe's containing folder, named as a lowercase slug
   (`recipes/curries/`, `recipes/main-dishes/`). The index heading is derived from the
   slug by `prettyCategory()` (title-cased, minor words like "and"/"of" kept lowercase);
-  add a `CATEGORY_LABELS` entry in `build.mjs` for names the slug can't express (commas,
-  `&`). Files directly in `recipes/` map to "(root)". **Keep folder names lowercase** —
+  add a `categoryLabels` entry in `site.config.json` for names the slug can't express
+  (commas, `&`). Files directly in `recipes/` map to "(root)". **Keep folder names lowercase** —
   the Linux CI build is case-sensitive even though macOS isn't, so a stray `Curries/`
   becomes a second category there.
 - Add a recipe by dropping a `.md` in a category folder (and optionally a matching image

@@ -1,5 +1,9 @@
 # Dependencies
 node_modules/
+# Lockfile is not committed: local `npm install` bakes in an internal registry
+# (~/.npmrc → npm.apple.com) that GitHub's cloud runners can't reach. CI runs
+# `npm install` fresh from the public registry instead.
+package-lock.json
 
 # Build output (generated from recipes/ by build.mjs; CI rebuilds on deploy)
 *.html
