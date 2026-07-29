@@ -7,6 +7,11 @@ const INPUT_DIR = "recipes";
 const OUTPUT_DIR = ".";
 const IMG_DIR = "img";
 
+// Site-specific config (title + category labels), kept separate so the build
+// framework can be reused for another site by swapping this file alone.
+const config = JSON.parse(fs.readFileSync("site.config.json", "utf-8"));
+const SITE_TITLE = config.title || "Recipes";
+
 // ---- helpers --------------------------------------------------------------
 
 function findMarkdown(dir) {
@@ -50,11 +55,9 @@ function isExternal(src) {
 }
 
 // Explicit display names for category folders whose slug can't capture the
-// intended punctuation (commas, ampersands). Anything not listed is derived
-// from the slug by prettyCategory(). Keyed by folder name.
-const CATEGORY_LABELS = {
-  "sandwiches-wraps-breads": "Sandwiches, Wraps & Breads",
-};
+// intended punctuation (commas, ampersands). Defined in site.config.json;
+// anything not listed is derived from the slug by prettyCategory().
+const CATEGORY_LABELS = config.categoryLabels || {};
 
 // Words kept lowercase mid-phrase when title-casing a category slug.
 const MINOR_WORDS = new Set(["and", "or", "the", "of", "with", "a", "an", "in", "on", "to", "for"]);
@@ -287,11 +290,11 @@ const index = `<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Recipe Index</title>
+<title>${escapeHtml(SITE_TITLE)}</title>
 <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-<h1>Recipe Index</h1>
+<h1>${escapeHtml(SITE_TITLE)}</h1>
 ${filterBar}
 ${sections}
   <p id="no-matches" hidden>No recipes match your filters.</p>
