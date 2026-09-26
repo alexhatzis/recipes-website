@@ -1,0 +1,96 @@
+  60  garlic
+  40  onion
+  26  cilantro
+  21  ginger
+  19  carrot
+  18  cashew
+  17  tomato
+  15  soy sauce
+  15  vegetable broth
+  13  coconut milk
+  12  basil
+  12  red onion
+  11  spinach
+  10  avocado
+  10  celery
+  10  lemon
+  10  tofu
+   9  flour
+   9  nutritional yeast
+   9  parsley
+   9  sweet potato
+   9  tomato paste
+   8  cauliflower
+   8  chickpea
+   7  bell pepper
+   7  kale
+   7  lentil
+   7  potato
+   7  shallot
+   6  corn
+   6  mushroom
+   6  parmesan cheese
+   6  scallion
+   5  balsamic
+   5  broccoli
+   5  fenugreek leaf
+   5  paneer
+   5  quinoa
+   5  sesame oil
+   4  black bean
+   4  cucumber
+   4  jackfruit
+   4  peanut butter
+   4  walnut
+   4  zucchini
+   3  almond
+   3  arugula
+   3  asparagus
+   3  beet
+   3  cabbage
+   3  eggplant
+   3  feta cheese
+   3  ground beef
+   3  mozzarella
+   3  soy curl
+   3  tempeh
+   3  white bean
+   3  yogurt
+   2  butternut squash
+   2  olive
+   2  leek
+   2  dairy milk
+   2  miso paste
+   2  non-dairy milk
+   2  pea
+   2  peanut
+   2  pecan
+   2  pecorino
+   2  pistachio
+   2  rice
+   2  salsa
+   2  seitan
+   2  sour cream
+   2  spaghetti squash
+   2  tomato sauce
+   1  basil pesto
+   1  bok choy
+   1  brussels sprout
+   1  burrata cheese
+   1  chickpea flour
+   1  cottage cheese
+   1  goat cheese
+   1  hearts of palm
+   1  kidney bean
+   1  plantain
+   1  spicy pepper
+   1  pumpkin
+   1  ricotta
+   1  sauerkraut
+   1  kidney bean
+   1  pinto bean
+
+
+
+
+319 distinct ingredients across 971 tags.

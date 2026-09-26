@@ -33,7 +33,7 @@ jobs:
           npm install
       - name: Compile to static HTML
         run: |
-          ./convert-recipes.sh
+          npm run build
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact

@@ -1,0 +1,43 @@
+---
+title: "Corn Chowder"
+image: soups-and-chowders/corn-chowder.jpg
+time: 50 minutes
+servings: 8
+source: https://cookieandkate.com/vegetarian-corn-chowder-recipe/
+ingredients: [corn, potato, red onion, spicy pepper, bell pepper, celery, garlic, vegetable broth, cilantro, sour cream, scallion]
+tags: [vegetarian, soup, american]
+---
+
+# Corn Chowder
+
+## ingredients
+* 1 tablespoon extra-virgin olive oil
+* 8 ears of fresh sweet corn, shucked (or 6 cups frozen corn kernels)
+* 1 pound red potatoes, cut into ¾” cubes (about 3 cups)
+* 1 large red onion, chopped
+* 1 poblano pepper (optional)*, seeds and ribs removed, chopped
+* 1 red bell pepper, chopped
+* 2 celery ribs, chopped
+* ¾ teaspoon salt, divided, to taste
+* ½ teaspoon chili powder
+* 2 medium cloves garlic, pressed or minced
+* 4 cups (32 ounces) vegetable broth
+* 2 cups water
+* 1 bay leaf
+* 2 tablespoons unsalted butter, cut into 4 pieces
+* ¼ cup chopped cilantro
+* ¼ cup crème fraîche or sour cream or Greek yogurt**
+* 1 tablespoon fresh lime juice
+* Freshly ground black pepper, to taste
+* Suggested garnishes: Grated sharp cheddar cheese, thinly sliced green onion, additional cilantro leaves and/or a tiny pinch of chili powder
+
+## steps
+1. In a medium/large Dutch oven or soup pot, warm the olive oil over medium heat until shimmering. Add the corn, potatoes, onion, poblano, bell pepper, celery, ½ teaspoon of the salt, and ½ teaspoon chili powder. Stir to combine. Cook until the onions are tender and translucent, about 7 to 10 minutes, stirring every couple of minutes.
+2. Add the garlic and cook until fragrant, about 30 seconds to 1 minute, while stirring constantly. Add the broth and water and stir to combine. Drop in the bay leaf.
+3. Bring the mixture to a boil over high heat, then reduce the heat as necessary to maintain a gentle simmer. Simmer for 20 to 25 minutes, stirring occasionally. It’s not done until the potatoes are fully cooked through and very easily pierced through with a fork.
+4. Remove the pot from the heat. Using kitchen tongs, remove the bay leaf. Carefully transfer about 3 cups of the soup (about half liquid, half solids) to a blender. Securely fasten the lid and be careful to avoid the hot steam as you blend until completely smooth. Add the butter and blend again.
+5. Pour the mixture back into the pot. Add the cilantro, crème fraîche (see note if using sour cream or Greek yogurt) and lime juice. Stir to combine. Season with the remaining ¼ teaspoon salt and be generous with the black pepper, to taste. If you’d like more spice, add up to ½ teaspoon more chili powder, to taste.
+6. Divide the chowder into bowls and top with garnishes of your choice. Leftover chowder will keep well in the refrigerator, covered, for up to 5 days or for several months frozen.
+
+## based on
+* https://cookieandkate.com/vegetarian-corn-chowder-recipe/
